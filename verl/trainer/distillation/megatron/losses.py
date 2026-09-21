@@ -220,9 +220,7 @@ class _VocabParallelKLDivergence(torch.autograd.Function):
                 global_log_z,
                 local_student_topk_logps,
                 local_student_topk_ids,
-            ) = _chunked_student_topk_stats(
-                vp_logits, target_topk_indices, chunk_size, local_topk, vocab_start_index
-            )
+            ) = _chunked_student_topk_stats(vp_logits, target_topk_indices, chunk_size, local_topk, vocab_start_index)
             vp_source_probs = None
         else:
             # Compute softmax over vocab-parallel logits
@@ -388,9 +386,7 @@ class _VocabParallelKLDivergence(torch.autograd.Function):
                 del p_c
             grad_input = grad_input.view(*target_active_mass.shape, partition_vocab_size)
         else:
-            vp_source_probs, target_topk_probs, target_topk_indices, active_mask, target_active_mass = (
-                ctx.saved_tensors
-            )
+            vp_source_probs, target_topk_probs, target_topk_indices, active_mask, target_active_mass = ctx.saved_tensors
             # Scale by m_A: grad starts as m_A * p_j for all j on this shard.
             grad_input = vp_source_probs * target_active_mass.unsqueeze(-1)  # [b, s, vocab_shard]
 
